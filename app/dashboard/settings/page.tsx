@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Save, Loader2, Check } from "lucide-react"
 import { useInstagramSession } from "@/hooks/use-instagram-session"
+import { AccountSwitcher } from "@/components/dashboard/AccountSwitcher"
 
 const fields = [
     ["business_name", "Business name", "What should customers call your business?"],
@@ -14,7 +15,7 @@ const fields = [
 ] as const
 
 export default function SettingsPage() {
-    const { userId, isLoading: sessionLoading } = useInstagramSession()
+    const { userId, username, isLoading: sessionLoading } = useInstagramSession()
     const [knowledge, setKnowledge] = useState<Record<string, string>>({})
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -22,6 +23,7 @@ export default function SettingsPage() {
 
     useEffect(() => {
         if (!userId) return
+        setLoading(true)
         fetch(`/api/business-profile?userId=${userId}`)
             .then((res) => res.json())
             .then((data) => setKnowledge(data.knowledge ?? {}))
@@ -49,10 +51,21 @@ export default function SettingsPage() {
 
     return (
         <div className="mx-auto max-w-4xl px-5 py-7 sm:px-8 lg:px-10">
-            <div className="border-b border-border pb-7">
-                <p className="text-sm text-muted-foreground">Workspace settings</p>
-                <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-foreground">Preferences</h1>
-                <p className="mt-2 text-sm text-muted-foreground">Give your assistant accurate business information for better replies.</p>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border pb-7">
+                <div>
+                    <div className="flex items-center gap-2">
+                        <p className="text-sm text-muted-foreground">Workspace settings</p>
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-semibold text-foreground border border-border/60">
+                            <span className="size-1.5 rounded-full bg-emerald-500" />
+                            @{username || "creator"}
+                        </span>
+                    </div>
+                    <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-foreground">Preferences</h1>
+                    <p className="mt-2 text-sm text-muted-foreground">Give your assistant accurate business information for better replies.</p>
+                </div>
+                <div className="w-56 shrink-0">
+                    <AccountSwitcher showBadge />
+                </div>
             </div>
             <div className="mt-7 space-y-5 rounded-xl border border-border bg-card p-6">
                 {fields.map(([key, label, placeholder]) => (

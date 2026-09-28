@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { ChevronLeft, ChevronRight, LifeBuoy, LogOut, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { AccountSwitcher } from "@/components/dashboard/AccountSwitcher"
 
 const NAV = [
   { href: "/dashboard", label: "Home", icon: "/icons/home.svg" },
@@ -66,14 +67,9 @@ export function Sidebar({ className, username = "creator", profilePic, onLogout,
         </a>
       </nav>
 
-      <div className="border-t border-sidebar-border p-3">
-        {!collapsed && <div className="mb-3 flex items-center justify-between px-1"><span className="text-xs text-muted-foreground">Appearance</span><ThemeToggle className="h-7 w-14" /></div>}
-        <div className={cn("flex items-center rounded-lg bg-sidebar-accent p-2", collapsed ? "justify-center" : "gap-2.5")}>
-          <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-sidebar-primary text-xs font-semibold text-sidebar-primary-foreground">
-            {profilePic ? <img src={profilePic} alt={username} className="size-full object-cover" /> : username.charAt(0).toUpperCase()}
-          </div>
-          {!collapsed && <><div className="min-w-0 flex-1"><p className="truncate text-xs font-medium">@{username}</p><p className="mt-0.5 text-[11px] text-muted-foreground">Instagram connected</p></div><button onClick={onLogout} aria-label="Log out" title="Log out" className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-sidebar hover:text-destructive"><LogOut className="size-4" /></button></>}
-        </div>
+      <div className="border-t border-sidebar-border p-3 space-y-2">
+        {!collapsed && <div className="flex items-center justify-between px-1"><span className="text-xs text-muted-foreground">Appearance</span><ThemeToggle className="h-7 w-14" /></div>}
+        <AccountSwitcher collapsed={collapsed} showBadge />
       </div>
     </aside>
   )

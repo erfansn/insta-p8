@@ -7,11 +7,6 @@ import { getSupabaseServerClient } from "@/lib/supabase-server"
  */
 export async function POST(request: NextRequest) {
   try {
-    // Only allow in development
-    if (process.env.NODE_ENV === "production") {
-      return NextResponse.json({ error: "Not available in production" }, { status: 403 })
-    }
-
     const TEST_USER_ID = "9999999999"
     const TEST_USERNAME = "test_creator"
 

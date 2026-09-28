@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Search, Loader2, UserCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { AccountSwitcher } from "@/components/dashboard/AccountSwitcher"
 import type { Conversation } from "@/types/db"
 
 interface ConversationListProps {
@@ -17,6 +18,7 @@ export function ConversationList({ userId, selectedId, onSelect }: ConversationL
 
     useEffect(() => {
         if (!userId) return
+        setLoading(true)
 
         const fetchConversations = async () => {
             try {
@@ -45,8 +47,13 @@ export function ConversationList({ userId, selectedId, onSelect }: ConversationL
 
     return (
         <div className="flex flex-col h-full border-r border-border bg-card w-full md:w-[350px]">
-            <div className="p-4 border-b border-border">
-                <h2 className="text-lg font-semibold text-foreground mb-4">Conversations</h2>
+            <div className="p-4 border-b border-border space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                    <h2 className="text-base font-semibold text-foreground">Conversations</h2>
+                    <div className="w-40 shrink-0">
+                        <AccountSwitcher showBadge className="py-1 px-2 text-xs" />
+                    </div>
+                </div>
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <input

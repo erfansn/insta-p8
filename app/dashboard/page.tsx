@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowRight, Bot, CheckCircle2, Loader2, MessageSquare, Plus, Users, Workflow } from "lucide-react"
 import { useInstagramSession } from "@/hooks/use-instagram-session"
+import { AccountSwitcher } from "@/components/dashboard/AccountSwitcher"
 
 interface DashboardStats {
   metrics: { totalAutomations: number; activeTriggers: number; audienceReached: number; messagesSent: number }
@@ -11,7 +12,7 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
-  const { username, userId, isLoading: sessionLoading } = useInstagramSession()
+  const { username, userId, accounts, isLoading: sessionLoading } = useInstagramSession()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -30,8 +31,24 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto w-full max-w-[1440px] px-5 py-7 sm:px-8 lg:px-10">
       <header className="flex flex-col justify-between gap-5 border-b border-border pb-7 sm:flex-row sm:items-end">
-        <div><p className="text-sm text-muted-foreground">Welcome back, {username || "creator"}</p><h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em]">Your workspace</h1></div>
-        <Link href="/dashboard/automations" className="inline-flex h-10 w-fit items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"><Plus className="size-4" />Create workflow</Link>
+        <div>
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-muted-foreground">Welcome back,</p>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-semibold text-foreground border border-border/60">
+              <span className="size-1.5 rounded-full bg-emerald-500" />
+              @{username || "creator"}
+            </span>
+          </div>
+          <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em]">Your workspace</h1>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="w-56">
+            <AccountSwitcher showBadge />
+          </div>
+          <Link href="/dashboard/automations" className="inline-flex h-10 w-fit items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+            <Plus className="size-4" />Create workflow
+          </Link>
+        </div>
       </header>
 
       <section className="grid border-b border-border sm:grid-cols-2 lg:grid-cols-4" aria-label="Account summary">
@@ -50,7 +67,34 @@ export default function DashboardPage() {
         </section>
 
         <aside className="space-y-6">
-          <section className="rounded-xl border border-border bg-card p-5"><div className="flex items-center gap-3"><span className="flex size-9 items-center justify-center rounded-lg bg-secondary"><Bot className="size-4" /></span><div><h2 className="text-sm font-semibold">Automation status</h2><p className="mt-0.5 text-xs text-muted-foreground">Your workspace is connected</p></div></div><dl className="mt-5 space-y-3 border-t border-border pt-4 text-sm"><div className="flex justify-between"><dt className="text-muted-foreground">Instagram</dt><dd className="flex items-center gap-1.5 font-medium"><span className="size-1.5 rounded-full bg-foreground" />Connected</dd></div><div className="flex justify-between"><dt className="text-muted-foreground">Running workflows</dt><dd className="font-medium">{metrics?.activeTriggers ?? 0}</dd></div></dl></section>
+          <section className="rounded-xl border border-border bg-card p-5">
+            <div className="flex items-center gap-3">
+              <span className="flex size-9 items-center justify-center rounded-lg bg-secondary">
+                <Bot className="size-4" />
+              </span>
+              <div>
+                <h2 className="text-sm font-semibold">Automation status</h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">Active: @{username}</p>
+              </div>
+            </div>
+            <dl className="mt-5 space-y-3 border-t border-border pt-4 text-sm">
+              <div className="flex justify-between items-center">
+                <dt className="text-muted-foreground">Current Account</dt>
+                <dd className="font-semibold text-foreground">@{username}</dd>
+              </div>
+              <div className="flex justify-between items-center">
+                <dt className="text-muted-foreground">Connected Profiles</dt>
+                <dd className="flex items-center gap-1.5 font-medium">
+                  <span className="size-1.5 rounded-full bg-emerald-500" />
+                  {accounts.length} {accounts.length === 1 ? "account" : "accounts"}
+                </dd>
+              </div>
+              <div className="flex justify-between items-center">
+                <dt className="text-muted-foreground">Running workflows</dt>
+                <dd className="font-medium">{metrics?.activeTriggers ?? 0}</dd>
+              </div>
+            </dl>
+          </section>
           <section className="rounded-xl bg-primary p-5 text-primary-foreground"><h2 className="text-sm font-semibold">Build your next workflow</h2><p className="mt-2 text-xs leading-5 text-primary-foreground/75">Turn a comment, direct message, or story reply into an automatic response.</p><Link href="/dashboard/automations" className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold">Open workflow builder<ArrowRight className="size-3.5" /></Link></section>
         </aside>
       </div>

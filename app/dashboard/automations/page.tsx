@@ -6,10 +6,11 @@ import { useInstagramSession } from "@/hooks/use-instagram-session"
 import { QuickAutomationForm } from "@/components/dashboard/QuickAutomationForm"
 import { AssistantSettings } from "@/components/dashboard/AssistantSettings"
 import { CreateRuleForm } from "@/components/dashboard/CreateRuleForm"
+import { AccountSwitcher } from "@/components/dashboard/AccountSwitcher"
 import type { Automation } from "@/lib/types"
 
 export default function AutomationsPage() {
-  const { userId, isLoading: sessionLoading } = useInstagramSession()
+  const { userId, username, isLoading: sessionLoading } = useInstagramSession()
   const [rules, setRules] = useState<Automation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -53,9 +54,23 @@ export default function AutomationsPage() {
   const filtered = rules.filter(rule => `${rule.name} ${rule.trigger_value} ${rule.response_content?.message || ""}`.toLowerCase().includes(query.toLowerCase()))
   const button = "rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
   return <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
-    <header className="mb-8 flex items-start justify-between gap-4">
-      <div><h1 className="text-2xl font-semibold tracking-tight">Auto replies</h1><p className="mt-1.5 text-sm text-muted-foreground">A keyword comes in. Your answer goes out.</p></div>
-      <span className="pt-1 text-xs text-muted-foreground">{rules.filter(rule => rule.is_active).length} active</span>
+    <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-semibold tracking-tight">Auto replies</h1>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-semibold text-foreground border border-border/60">
+            <span className="size-1.5 rounded-full bg-emerald-500" />
+            @{username || "creator"}
+          </span>
+        </div>
+        <p className="mt-1.5 text-sm text-muted-foreground">A keyword comes in. Your answer goes out.</p>
+      </div>
+      <div className="flex items-center gap-3">
+        <div className="w-52">
+          <AccountSwitcher showBadge />
+        </div>
+        <span className="text-xs text-muted-foreground shrink-0">{rules.filter(rule => rule.is_active).length} active</span>
+      </div>
     </header>
     {edit ? <section>
       <button className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setEdit(null)}><ArrowLeft className="size-4" />Back to auto replies</button>

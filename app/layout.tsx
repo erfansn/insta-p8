@@ -1,13 +1,16 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
 
 export const metadata: Metadata = {
-  title: "InstaAuto — Instagram Automation",
+  title: "InstaAuto - Instagram Automation",
   description: "Auto-reply to comments, DMs, and stories with keyword triggers.",
+  openGraph: {
+    title: "InstaAuto - Instagram Automation",
+    description: "Auto-reply to comments, DMs, and stories with keyword triggers.",
+  },
   icons: {
     icon: [
       {
@@ -58,7 +61,6 @@ export default function RootLayout({
         <ThemeProvider>
           {children}
         </ThemeProvider>
-        <Analytics />
         <Toaster />
       </body>
     </html>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useInstagramSession } from "@/hooks/use-instagram-session"
 import { ConversationList } from "@/components/inbox/ConversationList"
 import { ChatWindow } from "@/components/inbox/ChatWindow"
@@ -12,6 +12,12 @@ export default function InboxPage() {
     const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null)
     const [selectedRecipientName, setSelectedRecipientName] = useState<string | null>(null)
     const [selectedRecipientId, setSelectedRecipientId] = useState<string | null>(null)
+
+    useEffect(() => {
+        setSelectedConversationId(null)
+        setSelectedRecipientName(null)
+        setSelectedRecipientId(null)
+    }, [userId])
 
     const handleSelect = (id: string, name: string, recipientId: string) => {
         setSelectedConversationId(id)

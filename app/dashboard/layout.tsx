@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Sidebar } from "@/components/layout/sidebar"
 import { MobileNav } from "@/components/layout/mobile-nav"
+import { AccountSwitcher } from "@/components/dashboard/AccountSwitcher"
 import { useInstagramSession } from "@/hooks/use-instagram-session"
 import { Loader2 } from "lucide-react"
 
@@ -53,7 +54,10 @@ export default function DashboardLayout({
                 {/* Mobile Header (Visible only on small screens) */}
                 <header className="md:hidden h-16 border-b border-border bg-background flex items-center justify-between px-4 sticky top-0 z-40">
                     <span className="font-serif-display text-xl text-foreground">insta-p8</span>
-                    <MobileNav username={username || "User"} profilePic={profilePic} onLogout={logout} />
+                    <div className="flex items-center gap-2">
+                        <AccountSwitcher className="w-auto py-1 px-2 border" />
+                        <MobileNav username={username || "User"} profilePic={profilePic} onLogout={logout} />
+                    </div>
                 </header>
 
                 <main className="dashboard-canvas flex-1 relative overflow-auto">

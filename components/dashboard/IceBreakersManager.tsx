@@ -7,17 +7,19 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2, Plus, Trash2, Save, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
+import { AccountSwitcher } from "@/components/dashboard/AccountSwitcher"
 
 type IceBreakerRow = { id?: string; question: string; response: string }
 
 export function IceBreakersManager() {
-    const { userId, isLoading } = useInstagramSession()
+    const { userId, username, isLoading } = useInstagramSession()
     const [breakers, setBreakers] = useState<IceBreakerRow[]>([])
     const [saving, setSaving] = useState(false)
     const [fetching, setFetching] = useState(true)
 
     useEffect(() => {
         if (!userId) return
+        setFetching(true)
         fetch(`/api/ice-breakers?userId=${userId}`)
             .then(res => res.json())
             .then(data => {
@@ -106,21 +108,32 @@ export function IceBreakersManager() {
 
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border pb-5">
                 <div>
-                    <h2 className="text-3xl font-semibold tracking-[-0.03em] text-foreground">Conversation starters</h2>
-                    <p className="text-muted-foreground text-sm">
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-3xl font-semibold tracking-[-0.03em] text-foreground">Conversation starters</h2>
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-semibold text-foreground border border-border/60">
+                            <span className="size-1.5 rounded-full bg-emerald-500" />
+                            @{username || "creator"}
+                        </span>
+                    </div>
+                    <p className="text-muted-foreground text-sm mt-1">
                         Questions people see when they start a chat with you.
                     </p>
                 </div>
-                <Button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="bg-primary text-primary-foreground hover:opacity-90 font-bold"
-                >
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-                    Save & Sync
-                </Button>
+                <div className="flex items-center gap-3">
+                    <div className="w-52 shrink-0">
+                        <AccountSwitcher showBadge />
+                    </div>
+                    <Button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="bg-primary text-primary-foreground hover:opacity-90 font-bold shrink-0"
+                    >
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                        Save & Sync
+                    </Button>
+                </div>
             </div>
 
             <div className="space-y-4">

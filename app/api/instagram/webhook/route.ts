@@ -590,7 +590,7 @@ export async function POST(request: NextRequest) {
                     if (triggerType === "postback") {
                       if (isUnlockEvent) {
                         const ruleId = triggerValue.replace("UNLOCK_CONTENT_", "")
-                        match = automations.find((a) => a.id === ruleId)
+                        match = automations.find((a: any) => a.id === ruleId)
                       } else if (triggerValue.startsWith("ICE_BREAKER_")) {
                         const iceBreakerId = triggerValue.replace("ICE_BREAKER_", "")
                         const { data: ib } = await supabase
@@ -603,17 +603,17 @@ export async function POST(request: NextRequest) {
                           match = { name: "Ice Breaker: " + ib.question, response_content: { message: ib.response } }
                         }
                       } else {
-                        match = automations.find((a) => a.trigger_type === "postback" && a.trigger_value === triggerValue)
+                        match = automations.find((a: any) => a.trigger_type === "postback" && a.trigger_value === triggerValue)
                         // Quick reply payloads can also match keyword rules
                         if (!match) {
                           match = dmAutomations.find(
-                            (a) => a.trigger_type === "keyword" && keywordMatches(a.trigger_value, triggerValue.toLowerCase()),
+                            (a: any) => a.trigger_type === "keyword" && keywordMatches(a.trigger_value, triggerValue.toLowerCase()),
                           )
                         }
                       }
                     } else {
                       match = dmAutomations.find(
-                        (a) => a.trigger_type === "keyword" && keywordMatches(a.trigger_value, triggerValue),
+                        (a: any) => a.trigger_type === "keyword" && keywordMatches(a.trigger_value, triggerValue),
                       )
                     }
 

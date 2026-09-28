@@ -72,3 +72,13 @@ export interface Automation {
   media_selection?: MediaSelection | null
   selected_reel_id?: string | null
 }
+
+export interface InstagramAccount {
+  userId: string
+  username: string
+  profilePic?: string | null
+  name?: string
+  bio?: string
+  addedAt?: string
+  isTestAccount?: boolean
+}

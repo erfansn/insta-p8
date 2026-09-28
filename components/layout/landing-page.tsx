@@ -29,8 +29,37 @@ export function LandingPage() {
   }
 
   const handleTestLogin = () => {
+    const demoAccounts = [
+      {
+        userId: "9999999999",
+        username: "test_creator",
+        profilePic: null,
+        name: "Creator Hub",
+        bio: "Digital creator & community manager",
+        isTestAccount: true,
+      },
+      {
+        userId: "8888888888",
+        username: "lifestyle_agency",
+        profilePic: null,
+        name: "Apex Lifestyle Media",
+        bio: "Social media agency & brand partnerships",
+        isTestAccount: true,
+      },
+      {
+        userId: "7777777777",
+        username: "shop_boutique",
+        profilePic: null,
+        name: "Velvet & Stone Apparel",
+        bio: "Fashion ecommerce & customer support",
+        isTestAccount: true,
+      },
+    ]
+
+    localStorage.setItem("ig_accounts", JSON.stringify(demoAccounts))
     localStorage.setItem("ig_user_id", "9999999999")
     localStorage.setItem("ig_username", "test_creator")
+    document.cookie = `insta_session=${encodeURIComponent(JSON.stringify({ username: "test_creator", userId: "9999999999" }))}; path=/; max-age=5184000; SameSite=Lax`
     router.push("/dashboard")
   }
 
@@ -70,14 +99,12 @@ export function LandingPage() {
             <span className="hidden sm:inline">Star</span>
             {stars !== null && <span className="text-[#ffe14d]">{stars}</span>}
           </a>
-          {process.env.NODE_ENV === "development" && (
-            <button
-              onClick={handleTestLogin}
-              className="font-mono-ui text-xs font-bold text-[#ffe14d] border border-[#ffe14d]/30 rounded-full px-4 py-1.5 hover:bg-[#ffe14d]/10 transition-colors"
-            >
-              Dev Login
-            </button>
-          )}
+          <button
+            onClick={handleTestLogin}
+            className="font-mono-ui text-xs font-bold text-[#ffe14d] border border-[#ffe14d]/30 rounded-full px-4 py-1.5 hover:bg-[#ffe14d]/10 transition-colors"
+          >
+            Demo Login
+          </button>
           <button
             onClick={handleLogin}
             className="font-mono-ui text-xs font-bold bg-white text-black rounded-full px-4 py-1.5 hover:bg-[#ffe14d] transition-colors"
@@ -115,15 +142,13 @@ export function LandingPage() {
                 Connect Instagram
                 <ArrowUpRight className="w-4 h-4 group-hover:rotate-45 transition-transform" />
               </button>
-              {process.env.NODE_ENV === "development" && (
-                <button
-                  onClick={handleTestLogin}
-                  className="group flex items-center gap-2 font-mono-ui text-sm font-bold text-[#ffe14d] border border-[#ffe14d]/25 px-7 py-4 rounded-full hover:bg-[#ffe14d]/10 active:scale-[0.98] transition-all"
-                >
-                  <Terminal className="w-4 h-4" />
-                  Dev Login
-                </button>
-              )}
+              <button
+                onClick={handleTestLogin}
+                className="group flex items-center gap-2 font-mono-ui text-sm font-bold text-[#ffe14d] border border-[#ffe14d]/25 px-7 py-4 rounded-full hover:bg-[#ffe14d]/10 active:scale-[0.98] transition-all"
+              >
+                <Terminal className="w-4 h-4" />
+                Demo Login
+              </button>
               <a
                 href={TELEGRAM_URL} target="_blank" rel="noreferrer"
                 className="flex items-center gap-2 font-mono-ui text-sm text-neutral-300 border border-white/15 px-6 py-4 rounded-full hover:border-[#2AABEE]/60 hover:text-[#2AABEE] transition-colors"

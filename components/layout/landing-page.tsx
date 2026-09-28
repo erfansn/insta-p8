@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import {
   Zap, MessageCircle, Sparkles, ArrowUpRight, Github, Star,
   Send, AtSign, Brain, Inbox, Lock, Terminal,
@@ -13,7 +12,6 @@ const GITHUB_URL = "https://github.com/ayuuxh2/insta-p8"
 
 export function LandingPage() {
   const [stars, setStars] = useState<number | null>(null)
-  const router = useRouter()
 
   useEffect(() => {
     fetch("https://api.github.com/repos/ayuuxh2/insta-p8")
@@ -26,41 +24,6 @@ export function LandingPage() {
     // Instagram Business Login (Instagram API with Instagram Login). client_id must be the
     // Instagram app ID from the Instagram product page, not the parent Meta app ID.
     window.location.href = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${process.env.NEXT_PUBLIC_INSTAGRAM_APP_ID}&redirect_uri=${process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments`
-  }
-
-  const handleTestLogin = () => {
-    const demoAccounts = [
-      {
-        userId: "9999999999",
-        username: "test_creator",
-        profilePic: null,
-        name: "Creator Hub",
-        bio: "Digital creator & community manager",
-        isTestAccount: true,
-      },
-      {
-        userId: "8888888888",
-        username: "lifestyle_agency",
-        profilePic: null,
-        name: "Apex Lifestyle Media",
-        bio: "Social media agency & brand partnerships",
-        isTestAccount: true,
-      },
-      {
-        userId: "7777777777",
-        username: "shop_boutique",
-        profilePic: null,
-        name: "Velvet & Stone Apparel",
-        bio: "Fashion ecommerce & customer support",
-        isTestAccount: true,
-      },
-    ]
-
-    localStorage.setItem("ig_accounts", JSON.stringify(demoAccounts))
-    localStorage.setItem("ig_user_id", "9999999999")
-    localStorage.setItem("ig_username", "test_creator")
-    document.cookie = `insta_session=${encodeURIComponent(JSON.stringify({ username: "test_creator", userId: "9999999999" }))}; path=/; max-age=5184000; SameSite=Lax`
-    router.push("/dashboard")
   }
 
   return (
@@ -100,12 +63,6 @@ export function LandingPage() {
             {stars !== null && <span className="text-[#ffe14d]">{stars}</span>}
           </a>
           <button
-            onClick={handleTestLogin}
-            className="font-mono-ui text-xs font-bold text-[#ffe14d] border border-[#ffe14d]/30 rounded-full px-4 py-1.5 hover:bg-[#ffe14d]/10 transition-colors"
-          >
-            Demo Login
-          </button>
-          <button
             onClick={handleLogin}
             className="font-mono-ui text-xs font-bold bg-white text-black rounded-full px-4 py-1.5 hover:bg-[#ffe14d] transition-colors"
           >
@@ -141,13 +98,6 @@ export function LandingPage() {
               >
                 Connect Instagram
                 <ArrowUpRight className="w-4 h-4 group-hover:rotate-45 transition-transform" />
-              </button>
-              <button
-                onClick={handleTestLogin}
-                className="group flex items-center gap-2 font-mono-ui text-sm font-bold text-[#ffe14d] border border-[#ffe14d]/25 px-7 py-4 rounded-full hover:bg-[#ffe14d]/10 active:scale-[0.98] transition-all"
-              >
-                <Terminal className="w-4 h-4" />
-                Demo Login
               </button>
               <a
                 href={TELEGRAM_URL} target="_blank" rel="noreferrer"

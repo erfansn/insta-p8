@@ -9,33 +9,6 @@ const STORAGE_USER_ID_KEY = "ig_user_id"
 const STORAGE_USERNAME_KEY = "ig_username"
 const STORAGE_PROFILE_PIC_KEY = "ig_profile_pic"
 
-const DEFAULT_DEMO_ACCOUNTS: InstagramAccount[] = [
-  {
-    userId: "9999999999",
-    username: "test_creator",
-    profilePic: null,
-    name: "Creator Hub",
-    bio: "Digital creator & community manager",
-    isTestAccount: true,
-  },
-  {
-    userId: "8888888888",
-    username: "lifestyle_agency",
-    profilePic: null,
-    name: "Apex Lifestyle Media",
-    bio: "Social media agency & brand partnerships",
-    isTestAccount: true,
-  },
-  {
-    userId: "7777777777",
-    username: "shop_boutique",
-    profilePic: null,
-    name: "Velvet & Stone Apparel",
-    bio: "Fashion ecommerce & customer support",
-    isTestAccount: true,
-  },
-]
-
 // Module-level in-memory cache to guarantee reference stability and sync across all hooks
 let globalAccounts: InstagramAccount[] | null = null
 let globalActiveUserId: string | null = null
@@ -54,7 +27,7 @@ function notifySubscribers() {
 
 function loadFromStorage(): { accounts: InstagramAccount[]; activeId: string | null } {
   if (typeof window === "undefined") {
-    return { accounts: DEFAULT_DEMO_ACCOUNTS, activeId: DEFAULT_DEMO_ACCOUNTS[0].userId }
+    return { accounts: [], activeId: null }
   }
 
   let accounts: InstagramAccount[] = []
@@ -62,7 +35,7 @@ function loadFromStorage(): { accounts: InstagramAccount[]; activeId: string | n
     const raw = localStorage.getItem(STORAGE_ACCOUNTS_KEY)
     if (raw) {
       const parsed = JSON.parse(raw)
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed)) {
         accounts = parsed
       }
     }
@@ -70,6 +43,7 @@ function loadFromStorage(): { accounts: InstagramAccount[]; activeId: string | n
     console.error("Failed to parse stored accounts:", e)
   }
 
+  // If no list in STORAGE_ACCOUNTS_KEY, check for a single active session from OAuth
   if (accounts.length === 0) {
     const legacyId = localStorage.getItem(STORAGE_USER_ID_KEY)
     const legacyName = localStorage.getItem(STORAGE_USERNAME_KEY)
@@ -84,18 +58,10 @@ function loadFromStorage(): { accounts: InstagramAccount[]; activeId: string | n
           addedAt: new Date().toISOString(),
         },
       ]
-      for (const demo of DEFAULT_DEMO_ACCOUNTS) {
-        if (!accounts.some((a) => a.userId === demo.userId)) {
-          accounts.push(demo)
-        }
-      }
-    } else {
-      accounts = [...DEFAULT_DEMO_ACCOUNTS]
+      try {
+        localStorage.setItem(STORAGE_ACCOUNTS_KEY, JSON.stringify(accounts))
+      } catch {}
     }
-
-    try {
-      localStorage.setItem(STORAGE_ACCOUNTS_KEY, JSON.stringify(accounts))
-    } catch {}
   }
 
   let activeId = localStorage.getItem(STORAGE_USER_ID_KEY)
@@ -115,6 +81,8 @@ function loadFromStorage(): { accounts: InstagramAccount[]; activeId: string | n
         JSON.stringify({ username: activeAcc.username, userId: activeAcc.userId })
       )}; path=/; max-age=5184000; SameSite=Lax`
     } catch {}
+  } else if (accounts.length === 0) {
+    activeId = null
   }
 
   return { accounts, activeId }

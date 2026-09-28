@@ -7,9 +7,7 @@ import {
   Plus,
   Trash2,
   LogOut,
-  Sparkles,
   ArrowRight,
-  Loader2,
   Instagram,
   UserCheck,
 } from "lucide-react"
@@ -40,41 +38,17 @@ interface AccountSwitcherProps {
   showBadge?: boolean
 }
 
-const PRESET_DEMO_TEMPLATES = [
-  {
-    username: "agency_growth",
-    name: "Growth Agency",
-    bio: "Lead generation, booking automations, client onboarding",
-  },
-  {
-    username: "art_gallery_online",
-    name: "Canvas & Clay Gallery",
-    bio: "Art prints, catalog inquiries, pricing DMs",
-  },
-  {
-    username: "fitness_coach_dan",
-    name: "Coach Dan Fitness",
-    bio: "Workout guides, DM lead magnets, VIP coaching program",
-  },
-]
-
 export function AccountSwitcher({ collapsed = false, className, showBadge = false }: AccountSwitcherProps) {
   const {
     activeAccount,
     accounts,
     switchAccount,
-    addAccount,
     removeAccount,
     logout,
     logoutAll,
   } = useInstagramSession()
 
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<"quick" | "oauth">("quick")
-  const [customUsername, setCustomUsername] = useState("")
-  const [customName, setCustomName] = useState("")
-  const [customBio, setCustomBio] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const activeUserId = activeAccount?.userId
   const username = activeAccount?.username || "creator"
@@ -85,64 +59,11 @@ export function AccountSwitcher({ collapsed = false, className, showBadge = fals
     const redirectUri = process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI
 
     if (!clientId || !redirectUri) {
-      toast.info("Instagram OAuth credentials are not fully configured in .env. You can use Quick Add Account below for testing!")
-      setActiveTab("quick")
+      toast.error("Instagram OAuth credentials (NEXT_PUBLIC_INSTAGRAM_APP_ID or NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI) are not configured.")
       return
     }
 
     window.location.href = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments`
-  }
-
-  const handleAddCustomAccount = async (preset?: (typeof PRESET_DEMO_TEMPLATES)[0]) => {
-    const handle = (preset ? preset.username : customUsername).trim().replace(/^@/, "")
-    const name = preset ? preset.name : customName.trim()
-    const bio = preset ? preset.bio : customBio.trim()
-
-    if (!handle) {
-      toast.error("Please enter an Instagram handle")
-      return
-    }
-
-    setIsSubmitting(true)
-    try {
-      // Register account on backend
-      const res = await fetch("/api/instagram/accounts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: handle,
-          name: name || `@${handle}`,
-          bio: bio || `Automated Instagram profile for @${handle}`,
-        }),
-      })
-
-      const data = await res.json()
-      if (!res.ok || !data.account) {
-        throw new Error(data.error || "Failed to add account")
-      }
-
-      addAccount(data.account, true)
-      toast.success(`Account @${handle} added & active!`)
-      setCustomUsername("")
-      setCustomName("")
-      setCustomBio("")
-      setDialogOpen(false)
-    } catch (err: any) {
-      // Fallback: create locally
-      const fallbackAccount: InstagramAccount = {
-        userId: String(Math.floor(1000000000 + Math.random() * 9000000000)),
-        username: handle.toLowerCase(),
-        name: name || handle,
-        bio: bio || "Instagram Profile",
-        addedAt: new Date().toISOString(),
-        isTestAccount: true,
-      }
-      addAccount(fallbackAccount, true)
-      toast.success(`Account @${handle} added locally & active!`)
-      setDialogOpen(false)
-    } finally {
-      setIsSubmitting(false)
-    }
   }
 
   const handleRemove = (e: React.MouseEvent, acc: InstagramAccount) => {
@@ -284,7 +205,7 @@ export function AccountSwitcher({ collapsed = false, className, showBadge = fals
             <div className="flex size-6 items-center justify-center rounded-md border border-dashed border-border text-foreground">
               <Plus className="size-3.5" />
             </div>
-            <span>Add Instagram Account</span>
+            <span>Connect Instagram Account</span>
           </DropdownMenuItem>
 
           <DropdownMenuSeparator className="my-1.5" />
@@ -310,141 +231,41 @@ export function AccountSwitcher({ collapsed = false, className, showBadge = fals
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Add Account Modal */}
+      {/* Connect Account Modal */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-md p-6">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold flex items-center gap-2">
               <UserCheck className="size-5 text-primary" />
-              Add Instagram Account
+              Connect Instagram Account
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Manage multiple brand profiles, creator personas, or client pages with completely isolated workflows and inboxes.
+              Connect another Instagram professional or creator account via Meta OAuth to manage automations and conversations in one place.
             </DialogDescription>
           </DialogHeader>
 
-          {/* Tabs */}
-          <div className="mt-2 flex rounded-lg border border-border p-1 bg-muted/40">
-            <button
-              type="button"
-              onClick={() => setActiveTab("quick")}
-              className={cn(
-                "flex-1 py-1.5 text-xs font-medium rounded-md transition-all",
-                activeTab === "quick"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Quick / Custom Account
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("oauth")}
-              className={cn(
-                "flex-1 py-1.5 text-xs font-medium rounded-md transition-all",
-                activeTab === "oauth"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Instagram OAuth Login
-            </button>
-          </div>
-
-          {activeTab === "quick" ? (
-            <div className="mt-4 space-y-4">
-              {/* Presets */}
-              <div>
-                <p className="text-xs font-medium text-muted-foreground mb-2">
-                  One-click demo presets:
-                </p>
-                <div className="grid grid-cols-1 gap-2">
-                  {PRESET_DEMO_TEMPLATES.map((preset) => (
-                    <button
-                      key={preset.username}
-                      type="button"
-                      disabled={isSubmitting}
-                      onClick={() => handleAddCustomAccount(preset)}
-                      className="flex items-center justify-between rounded-lg border border-border bg-card p-2.5 text-left text-xs transition-colors hover:border-primary/50 hover:bg-accent/40"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-semibold text-foreground">@{preset.username}</span>
-                          <span className="text-[10px] text-muted-foreground">({preset.name})</span>
-                        </div>
-                        <p className="truncate text-[11px] text-muted-foreground">{preset.bio}</p>
-                      </div>
-                      <Plus className="size-4 shrink-0 text-muted-foreground ml-2" />
-                    </button>
-                  ))}
-                </div>
+          <div className="mt-4 space-y-4">
+            <div className="rounded-xl border border-border bg-card p-5 text-center">
+              <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white shadow-sm">
+                <Instagram className="size-6" />
               </div>
-
-              {/* Custom Handle Input */}
-              <div className="border-t border-border pt-3">
-                <p className="text-xs font-medium text-foreground mb-2">
-                  Or add any custom Instagram handle:
-                </p>
-                <div className="space-y-2">
-                  <div className="relative">
-                    <span className="absolute left-3 top-2.5 text-xs text-muted-foreground font-mono">@</span>
-                    <input
-                      type="text"
-                      placeholder="your_brand_handle"
-                      value={customUsername}
-                      onChange={(e) => setCustomUsername(e.target.value)}
-                      className="w-full rounded-lg border border-border bg-background py-2 pl-7 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Display name (optional, e.g. Studio X)"
-                    value={customName}
-                    onChange={(e) => setCustomName(e.target.value)}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                  <button
-                    type="button"
-                    disabled={isSubmitting || !customUsername.trim()}
-                    onClick={() => handleAddCustomAccount()}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
-                  >
-                    {isSubmitting ? (
-                      <Loader2 className="size-3.5 animate-spin" />
-                    ) : (
-                      <>
-                        <Sparkles className="size-3.5" />
-                        Create & Switch to Account
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="mt-4 space-y-4">
-              <div className="rounded-xl border border-border bg-card p-4 text-center">
-                <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-gradient-to-tr from-amber-500 via-pink-500 to-purple-600 text-white">
-                  <Instagram className="size-5" />
-                </div>
-                <h4 className="mt-3 text-sm font-semibold">Connect via Meta Instagram API</h4>
-                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                  Log in with another professional or creator Instagram account. The access token and page ID will be saved securely for webhooks and automations.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleOAuthConnect}
-                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
-                >
-                  Authorize with Instagram
-                  <ArrowRight className="size-3.5" />
-                </button>
-              </div>
-              <p className="text-[11px] text-muted-foreground text-center">
-                Note: In development or sandbox mode, make sure your Meta app has this Instagram account added as a tester.
+              <h4 className="mt-3.5 text-sm font-semibold text-foreground">Official Instagram Login</h4>
+              <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed max-w-sm mx-auto">
+                Authorize your business or creator page with Instagram. Tokens and webhook permissions will be securely linked for direct message and comment automations.
               </p>
+              <button
+                type="button"
+                onClick={handleOAuthConnect}
+                className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+              >
+                Authorize with Instagram
+                <ArrowRight className="size-3.5" />
+              </button>
             </div>
-          )}
+            <p className="text-[11px] text-muted-foreground text-center">
+              Make sure the Instagram account is set to Professional or Creator mode and linked to a Facebook Page if required by Meta.
+            </p>
+          </div>
         </DialogContent>
       </Dialog>
     </>
